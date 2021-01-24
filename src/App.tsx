@@ -1,56 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
-
-const all_categories = ["Sporting Goods", "Electronics"] as const;
-
-type Category = (typeof all_categories)[number];
-
-type Product = {
-  category: Category,
-  price: string,
-  stocked: boolean,
-  name: string
-};
-
-const products: Product[] = [
-  {
-    category: "Sporting Goods",
-    price: "$49.99",
-    stocked: true,
-    name: "Football",
-  },
-  {
-    category: "Sporting Goods",
-    price: "$9.99",
-    stocked: true,
-    name: "Baseball",
-  },
-  {
-    category: "Sporting Goods",
-    price: "$29.99",
-    stocked: false,
-    name: "Basketball",
-  },
-  {
-    category: "Electronics",
-    price: "$09.99",
-    stocked: true,
-    name: "iPad Touch",
-  },
-  {
-    category: "Electronics",
-    price: "$399.99",
-    stocked: false,
-    name: "iPhone 5",
-  },
-  {
-    category: "Electronics",
-    price: "$199.99",
-    stocked: true,
-    name: "Nexus 7",
-  },
-]
-
+import {Product, Category, allCategories, sampleProducts} from './products';
 
 const ProductRow: React.FC<{ product: Product }> = (props) =>
   <li>
@@ -69,12 +19,12 @@ const ProductCategoryRow: React.FC<{ category: Category }> = (props) =>
 
 const ProductTable: React.FC<{ products: Product[], isOnlyStocked: boolean, query: string }> = (props) =>
   <div>{
-    all_categories.map(category =>
+    allCategories.map(category =>
       <div>
         <ProductCategoryRow category={category} />
         <ul>
           {
-            products
+            props.products
               .filter(p => p.category === category)
               .filter(p => !props.isOnlyStocked || p.stocked)
               .filter(p => props.query === "" || p.name.match(props.query))
@@ -99,29 +49,29 @@ const SearchBar: React.FC<{
     </div >;
 
 
-class FilterableProductTable extends React.Component<{ products: Product[] }, { isOnlyStocked: boolean, query: string }> {
-  constructor(props: { products: Product[] }) {
-    super(props);
+const FilterableProductTable: React.FC<{ products: Product[] }> = (props) => {
+  const [isOnlyStocked, setIsOnlyStocked] = useState(false);
+  const [query, setQuery] = useState("");
 
-    this.state = {
-      isOnlyStocked: false,
-      query: ""
-    }
-  }
+  const onIsOnlyStockedChange: React.ChangeEventHandler<HTMLInputElement> = (e) =>
+    setIsOnlyStocked(e.target.checked);
 
-  onIsOnlyStockedChange: React.ChangeEventHandler<HTMLInputElement> = (e) => this.setState({ isOnlyStocked: e.target.checked })
-  onQueryChange: React.ChangeEventHandler<HTMLInputElement> = (e) => this.setState({ query: e.target.value })
+  const onQueryChange: React.ChangeEventHandler<HTMLInputElement> = (e) =>
+    setQuery(e.target.value);
 
-  render = () =>
-    <div className="filterable-product-table">
-      <SearchBar
-        onIsOnlyStockedChange={this.onIsOnlyStockedChange}
-        onQueryChange={this.onQueryChange}
-      />
-      <ProductTable products={this.props.products} isOnlyStocked={this.state.isOnlyStocked} query={this.state.query} />
-    </div>;
+  return <div className="filterable-product-table">
+    <SearchBar
+      onIsOnlyStockedChange={onIsOnlyStockedChange}
+      onQueryChange={onQueryChange}
+    />
+    <ProductTable
+      products={props.products}
+      isOnlyStocked={isOnlyStocked}
+      query={query}
+    />
+  </div>
 }
 
-const App = (_: any) => <FilterableProductTable products={products} />;
+const App = (_: any) => <FilterableProductTable products={sampleProducts} />;
 
 export default App;
