@@ -44,10 +44,9 @@ const SearchBar: React.FC<{
       </p>
       <p>
         <input type="checkbox" onChange={props.onIsOnlyStockedChange} />
-      在庫のある商品のみを表示する
-    </p>
+        在庫のある商品のみを表示する
+      </p>
     </div >;
-
 
 const FilterableProductTable: React.FC<{ products: Product[] }> = (props) => {
   const [isOnlyStocked, setIsOnlyStocked] = useState(false);
